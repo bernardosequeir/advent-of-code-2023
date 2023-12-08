@@ -17,6 +17,18 @@ impl GameCard {
 
         score
     }
+
+    fn get_matches(&self) -> u32 {
+        let mut matches = 0;
+
+        for number in &self.prize_numbers {
+            if self.card_numbers.contains(&number) {
+                matches+=1;
+            }
+        }
+
+        matches
+    }
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -31,7 +43,22 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let games = parse_input(input);
+    let mut counts = vec![0; games.len()];
+
+    let wins : Vec<u32> = games
+        .iter()
+        .map(|g| g.get_matches())
+        .collect();
+        
+    for i in 0..games.len() {
+        counts[i] += 1;
+        for j in 0..wins[i] {
+            counts[i + usize::try_from(j).unwrap() + 1] += counts[i];
+        }
+    }
+
+    Some(counts.iter().sum::<u32>())
 }
 
 pub fn parse_input(input: &str) -> Vec<GameCard> {
